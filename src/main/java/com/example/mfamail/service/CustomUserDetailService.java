@@ -29,7 +29,7 @@ public class CustomUserDetailService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepo.findByUsername(username);
     }
-    public String saveUserDetails(UserEntity user) throws Exception {
+    public void saveUserDetails(UserEntity user) throws Exception {
         if(userRepo.findByUsername(user.getUsername())!=null){
             throw new Exception("User Exist");
         }
@@ -40,14 +40,14 @@ public class CustomUserDetailService implements UserDetailsService {
                 LocalDateTime.now().plusMinutes(10),
                 user
         );
-        String link= "http://localhost:9191/register/verified?"+token;
+        String link= "http://localhost:9191/register/verified/"+user.getUsername();
         confirmationTokenService.saveConfirmationToken(confirmationToken);
         emailSender.send(user.getEmail(),buildEmail(user.getUsername(),link));
-        user.setVerify_email(true);
-        user.setSecret_key(twoFactorAuthService.generateNewSecret());
-
+//        user.setVerify_email(true);
+//        user.setSecret_key(twoFactorAuthService.generateNewSecret());
+//
         userRepo.save(user);
-        return twoFactorAuthService.generateQrCodeImageUri(user.getSecret_key());
+
     }
 
     private String buildEmail(String name, String link) {
