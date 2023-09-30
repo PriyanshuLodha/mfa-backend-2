@@ -1,11 +1,13 @@
 package com.example.mfamail.controller;
 
+import com.example.mfamail.entity.LoginEntity;
 import com.example.mfamail.entity.QrUserEntity;
 import com.example.mfamail.entity.UserEntity;
 import com.example.mfamail.repository.UserRepo;
 import com.example.mfamail.service.CustomUserDetailService;
 import com.example.mfamail.service.TwoFactorAuthService;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -47,5 +49,13 @@ public class RegistrationController {
     public Boolean checkOtp(@RequestBody QrUserEntity validateUser){
         UserEntity temp=userRepo.findByUsername(validateUser.getUsername());
         return twoFactorAuthService.isOtpValid(temp.getSecret_key(),validateUser.getOtp());
+    }
+    @GetMapping("/register/login")
+    public String loginUser(@RequestBody LoginEntity loginEntity){
+        UserEntity temp=userRepo.findByUsername(loginEntity.getUsername());
+        if(temp==null){
+            return new String("User not found");
+        }
+        return "Success";
     }
 }
